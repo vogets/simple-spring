@@ -6,7 +6,7 @@ pipeline {
   tools {
       jdk 'JDK8'
       maven 'maven'
-      docker 'myDocker'
+      dockerTool 'myDocker'
     }
   stages {
     stage(‘Build’) {
