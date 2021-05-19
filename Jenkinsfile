@@ -22,11 +22,15 @@ pipeline {
         }
       }
     }
+    stage(‘Initialize’){
+            def dockerHome = tool 'myDocker'
+            env.PATH = "${dockerHome}/bin:${env.PATH}"
+        }
      stage(‘Deploy’) {
       steps{
         script {
           docker.withRegistry( "https://registry.hub.docker.com", registryCredential ) {
-          dockerImage.push()
+          //dockerImage.push()
           app.push("latest")
           }
         }
