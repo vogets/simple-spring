@@ -1,9 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: springboot
+  labels:
+    app: spring-helloworld
   name: spring-helloworld
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: spring-helloworld
@@ -12,11 +15,47 @@ spec:
       labels:
         app: spring-helloworld
     spec:
+      serviceAccountName: jenkins-robot
       containers:
       - name: spring-helloworld
-        image: achyuth007/simple-spring:latest
+        image: vogetisameer12/simple-spring:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
-     
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  namespace: springboot
+  labels:
+    app: spring-helloworld
+  name: spring-helloworld
+spec:
+  ports:
+    - name: 8080-8080
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: spring-helloworld
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: spring-helloworld
+  namespace: springboot
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: \"false\"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /spring-helloworld
+            backend:
+              serviceName: spring-helloworld
+              servicePort: 8080
 
