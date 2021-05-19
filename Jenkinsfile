@@ -6,6 +6,7 @@ pipeline {
   tools {
       jdk 'JDK8'
       maven 'maven'
+      docker 'myDocker'
     }
   stages {
     stage(‘Build’) {
@@ -22,13 +23,7 @@ pipeline {
         }
       }
     }
-     stage(‘Initialize’){
-     steps{
-            def dockerHome = tool 'myDocker'
-            env.PATH = "${dockerHome}/bin:${env.PATH}"
-        }
-        }
-     stage(‘Deploy’) {
+    stage(‘Deploy’) {
       steps{
         script {
           docker.withRegistry( "https://registry.hub.docker.com", registryCredential ) {
