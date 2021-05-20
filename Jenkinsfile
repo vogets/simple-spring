@@ -33,14 +33,21 @@ pipeline {
         }
       }
     }
-    stage('Deploy to K8s') {
-       steps {
-        withKubeConfig([credentialsId: 'kubernetes-config']) {
-          sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"'
-          sh 'chmod u+x ./kubectl'
-          sh './kubectl apply -f sample.yaml'
+stage("SSH Into k8s Server") {
+        def remote = [:]
+        remote.name = 'master'
+        remote.host = '192.168.26.10'
+        remote.user = 'vagrant'
+        remote.password = 'vagrant'
+        remote.allowAnyHosts = true
+
+        stage('Put k8s-spring-boot-deployment.yml onto k8smaster') {
+            sshPut remote: remote, from: 'k8s-spring-boot-deployment.yml', into: '.'
         }
-      }
+
+        stage('Deploy spring boot') {
+          sshCommand remote: remote, command: "kubectl apply -f k8s-spring-boot-deployment.yml"
+        }
     }
   }
 }
